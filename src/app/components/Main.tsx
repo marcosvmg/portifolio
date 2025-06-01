@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function Main() {
   return (
-    <main className="relative flex flex-col gap-5 justify-center px-2 w-full max-w-full overflow-x-hidden">
+    <main className="relative flex flex-col gap-5 justify-center px-2 w-full  overflow-x-hidden container mx-auto py-4 ">
       {/* Container principal - muda para coluna em mobile */}
       <div className="flex flex-col md:flex-row bg-c0 rounded-2xl px-4 py-6 md:px-10 md:py-10 gap-6 md:gap-0 w-full max-w-full overflow-x-hidden">
         {/* Imagem */}
@@ -18,6 +18,7 @@ export default function Main() {
             height={720}
             alt="Foto do desenvolvedor"
             priority
+            draggable={false}
           />
         </div>
 
@@ -35,7 +36,7 @@ export default function Main() {
               </h1>
               <p className="text-base md:text-xl font-open-sans text-c3 mb-4 flex gap-2 items-center justify-center md:justify-end">
                 Localizado no Litoral de SP{' '}
-                <img
+                <Image
                   src="/assets/svg/beach.svg"
                   alt="Ícone de praia"
                   className="select-none"
@@ -47,7 +48,7 @@ export default function Main() {
           </div>
 
           {/* Container botão + seta no mobile */}
-          <div className="flex flex-col items-center md:items-end mt-6 md:mt-auto">
+          <div className="flex flex-col items-center md:items-end md:mt-auto">
             <Link
               href="#contato"
               className="bg-linear-90 from-[#7A37FF] to-[#4D17B8] py-3 px-6 md:px-8 text-lg md:text-2xl font-semibold font-poppins rounded-2xl hover:scale-95 active:scale-90 transition-all duration-300 inline-block"

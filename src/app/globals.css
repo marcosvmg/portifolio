@@ -34,3 +34,14 @@ body {
   color: var(--color-c4);
   font-family: var(--font-open-sans), Arial, Helvetica, sans-serif; /* Atualizado */
 }
+
+.vertical-container {
+  writing-mode: vertical-rl; /* texto na vertical, lendo de baixo para cima */
+  text-orientation: mixed;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.vertical-rotated-left {
+  transform: rotate(180deg); /* para inverter a direção e ter a letra E embaixo */
+}
