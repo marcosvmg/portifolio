@@ -28,7 +28,7 @@ export default function Header() {
 
   return (
     <header
-      className=" px-6 md:px-10  flex items-center justify-between relative z-50 container mx-auto py-4 w-full overflow-x-hidden"
+      className="w-full px-6 md:px-10  flex items-center justify-between relative z-50 container mx-auto pt-4 overflow-x-hidden overflow-y-hidden"
       role="banner"
     >
       <div className="text-w font-gochi text-4xl md:text-7xl select-none">

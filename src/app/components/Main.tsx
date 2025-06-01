@@ -6,9 +6,9 @@ import Link from 'next/link';
 
 export default function Main() {
   return (
-    <main className="relative flex flex-col gap-5 justify-center px-2 w-full  overflow-x-hidden container mx-auto py-4 ">
+    <main className="relative flex flex-col gap-2 justify-center px-2 w-full  overflow-x-hidden container mx-auto py-4 ">
       {/* Container principal - muda para coluna em mobile */}
-      <div className="flex flex-col md:flex-row bg-c0 rounded-2xl px-4 py-6 md:px-10 md:py-10 gap-6 md:gap-0 w-full max-w-full overflow-x-hidden">
+      <div className="flex flex-col md:flex-row bg-c0 rounded-2xl px-4 py-6 md:px-10 md:py-10 gap-2 md:gap-2  max-w-full overflow-x-hidden">
         {/* Imagem */}
         <div className="md:flex-1 relative w-full h-64 md:h-auto min-w-0">
           <Image
@@ -18,7 +18,7 @@ export default function Main() {
             height={720}
             alt="Foto do desenvolvedor"
             priority
-            draggable={false}
+
           />
         </div>
 
