@@ -1,14 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
-import Image from 'next/image';
-import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import React, {
+  useRef,
+  useLayoutEffect,
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 export type TimelineItem = {
   title: string;
   description: string;
   url: string;
   languages: string[];
-  imageUrl: string;
+  imageUrls: string[];
 };
 
 type TimelineProps = {
@@ -36,14 +42,18 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
   const titleRefs = useRef<(HTMLHeadingElement | null)[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [dotOffsets, setDotOffsets] = useState<number[]>([]);
+  const [currentIndexes, setCurrentIndexes] = useState<number[]>(
+    steps.map(() => 0),
+  );
 
+  // Calcula offsets dos títulos para os pontos verticais
   const calculateOffsets = () => {
     if (!wrapperRef.current) return;
     const wrapperTop = wrapperRef.current.getBoundingClientRect().top;
     const offsets = titleRefs.current.map((el) => {
       if (!el) return 24;
       const { top } = el.getBoundingClientRect();
-      return top - wrapperTop -17;
+      return top - wrapperTop - 17;
     });
     setDotOffsets(offsets);
   };
@@ -57,18 +67,55 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
     return () => window.removeEventListener('resize', calculateOffsets);
   }, []);
 
-  const renderDot = (idx: number) => {
-    if (idx === 0) return svgFirst;
-    if (idx === steps.length - 1) return svgLast;
-    return svgMiddle;
+  const goToImage = useCallback(
+    (stepIndex: number, targetIndex: number) => {
+      if (targetIndex === currentIndexes[stepIndex]) return;
+      setCurrentIndexes((prev) => {
+        const updated = [...prev];
+        updated[stepIndex] = targetIndex;
+        return updated;
+      });
+    },
+    [currentIndexes],
+  );
+
+  const goNext = useCallback(
+    (stepIndex: number) => {
+      const total = steps[stepIndex].imageUrls.length;
+      const newIndex = (currentIndexes[stepIndex] + 1) % total;
+      goToImage(stepIndex, newIndex);
+    },
+    [currentIndexes, steps, goToImage],
+  );
+
+  const goPrev = useCallback(
+    (stepIndex: number) => {
+      const total = steps[stepIndex].imageUrls.length;
+      const newIndex = (currentIndexes[stepIndex] - 1 + total) % total;
+      goToImage(stepIndex, newIndex);
+    },
+    [currentIndexes, steps, goToImage],
+  );
+
+  const handleDragEnd = (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+    stepIndex: number,
+  ) => {
+    const threshold = 30; // abaixei threshold pra ficar menos sensível
+    if (info.offset.x < -threshold) {
+      goNext(stepIndex);
+    } else if (info.offset.x > threshold) {
+      goPrev(stepIndex);
+    }
   };
 
   return (
     <div
-      className=" w-full flex px-4 md:px-10 py-10 bg-c1 rounded-2xl gap-6 relative select-none flex-col md:flex-row"
+      className="w-full flex px-4 md:px-10 py-10 bg-c1 rounded-2xl gap-6 relative select-none flex-col md:flex-row"
       ref={wrapperRef}
     >
-      {/* Linha vertical - só desktop */}
+      {/* Linha e pontos verticais */}
       <div
         className="relative w-2 bg-c2 rounded-full hidden md:block"
         style={{
@@ -89,86 +136,132 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
               alignItems: 'center',
             }}
           >
-            {renderDot(idx)}
+            {idx === 0
+              ? svgFirst
+              : idx === steps.length - 1
+              ? svgLast
+              : svgMiddle}
           </span>
         ))}
       </div>
 
       <ol className="flex flex-col flex-1 space-y-8 md:space-y-14">
         {steps.map((step, idx) => (
-          <li
-            key={idx}
-            className="relative flex flex-col"
-            style={{ minHeight: 'auto' }}
-          >
-            {/* Título + linha */}
+          <li key={idx} className="relative flex flex-col">
             <div className="flex items-center w-full mb-3">
               <h3
                 ref={(el) => {
                   titleRefs.current[idx] = el;
                 }}
-                className="text-2xl md:text-4xl font-poppins font-medium text-w whitespace-nowrap leading-none"
+                className="text-2xl md:text-4xl font-poppis font-medium text-w whitespace-nowrap leading-none"
               >
                 {step.title}
               </h3>
               <div className="flex-grow h-1 md:h-2 bg-[#54505A]/25 rounded ml-2 md:ml-4" />
             </div>
 
-            {/* Descrição + lado direito */}
             <div className="flex flex-col w-full mb-4 gap-4 md:gap-6">
-              {/* Descrição */}
               <p className="text-base md:text-2xl text-c3 w-full">
                 {step.description}
               </p>
-
-              {/* Lado direito (languages) - agora abaixo da descrição em mobile */}
-              <div className="flex flex-col w-full gap-2 md:gap-4">
-                <div className="flex flex-wrap gap-2">
-                  {step.languages.map((lang) => {
-                    const colorClass =
-                      languageColors[lang.toLowerCase()] || 'text-purple-800';
-                    return (
-                      <span
-                        key={lang}
-                        className={`bg-b font-semibold font-poppins text-[10px] md:text-[12px] px-3 md:px-4 py-1 md:py-2 rounded-lg md:rounded-xl select-none whitespace-nowrap ${colorClass}`}
-                      >
-                        {lang.toUpperCase()}
-                      </span>
-                    );
-                  })}
-                </div>
+              <div className="flex flex-wrap gap-2 md:justify-end">
+                {step.languages.map((lang) => {
+                  const color =
+                    languageColors[lang.toLowerCase()] || 'text-purple-800';
+                  return (
+                    <span
+                      key={lang}
+                      className={`bg-b font-semibold font-poppins text-[10px] md:text-[12px] px-3 md:px-4 py-1 md:py-2 rounded-lg md:rounded-xl select-none whitespace-nowrap ${color}`}
+                    >
+                      {lang.toUpperCase()}
+                    </span>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Botão e imagem - agora empilhados em mobile, imagem acima no mobile */}
             <div className="mt-auto flex flex-col md:flex-row items-center justify-between gap-4">
-              {/* Imagem - mobile order 1, desktop order 2 */}
               <div className="w-full md:w-80 h-auto order-1 md:order-2">
-                <Image
-                  src={step.imageUrl}
-                  alt={`Imagem do projeto ${step.title}`}
-                  className="w-full h-24 md:h-30 rounded-lg md:rounded-xl shadow-lg object-cover"
-                  loading="lazy"
-                  width={300}
-                  height={120}
-                  draggable={false}
-                />
+                <motion.div
+                  className="relative w-full h-24 md:h-30 overflow-hidden rounded-lg md:rounded-xl shadow-lg cursor-grab select-none"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2} // suaviza o drag, menos sensível
+                  onDragEnd={(e, info) => handleDragEnd(e, info, idx)}
+                  whileTap={{ cursor: 'grabbing' }}
+                >
+                  <AnimatePresence initial={false} custom={currentIndexes[idx]}>
+                    <motion.img
+                      key={currentIndexes[idx]}
+                      src={step.imageUrls[currentIndexes[idx]]}
+                      alt={`Imagem ${currentIndexes[idx]}`}
+                      className="absolute top-0 left-0 w-full h-full object-cover"
+                      draggable={false}
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -100 }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </AnimatePresence>
+
+                  <button
+                    className="absolute  left-1 top-1/2 -translate-y-1/2 z-10 p-2 rounded-2xl  hover:scale-90 transition-all duration-400  cursor-pointer "
+                    onClick={() => goPrev(idx)}
+                    aria-label="Imagem anterior"
+                    type="button"
+                  >
+                    <img
+                      src="/assets/svg/arrowLC.svg"
+                      alt=""
+                      width={24}
+                      height={24}
+                    />
+                  </button>
+                  <button
+                    className="absolute  right-1 top-1/2 -translate-y-1/2 z-10 p-2 rounded-2xl  hover:scale-90 transition-all duration-400  cursor-pointer "
+                    onClick={() => goNext(idx)}
+                    aria-label="Próxima imagem"
+                    type="button"
+                  >
+                    <img
+                      src="/assets/svg/arrowRC.svg"
+                      alt=""
+                      width={24}
+                      height={24}
+                    />
+                  </button>
+
+                  {/* Bolinhas indicadoras: movi pra fora do container da imagem para ficar abaixo */}
+                </motion.div>
+
+                {/* Container das bolinhas abaixo da imagem */}
+                <div className="flex justify-center gap-2 mt-3">
+                  {step.imageUrls.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goToImage(idx, i)}
+                      className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                        currentIndexes[idx] === i ? 'bg-c3/80' : 'bg-c3/40'
+                      }`}
+                      aria-label={`Ir para imagem ${i + 1}`}
+                      type="button"
+                      style={{ border: 'none', padding: 0 }}
+                    />
+                  ))}
+                </div>
               </div>
 
-              {/* Botão - mobile order 2, desktop order 1 */}
               <Link
                 href={step.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 md:gap-4 bg-b py-2 md:py-3 px-3 md:px-6 text-sm md:text-2xl font-semibold font-poppins rounded-lg md:rounded-xl hover:scale-95 active:scale-90 transition-all duration-300 w-full md:w-fit justify-center order-2 md:order-1"
-                aria-label="Ir para site externo"
               >
                 VISITE O SITE
                 <img
                   src="/assets/svg/arrowRGd2.svg"
                   width={24}
                   height={24}
-                  className="w-6 h-6 md:w-9 md:h-9"
                   alt=""
                 />
               </Link>

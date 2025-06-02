@@ -10,7 +10,11 @@ const steps: TimelineItem[] = [
       'Fiz esse projeto utilizando html, css e js para minha faculdade.',
     url: 'https://exemplo.com',
     languages: ['html', 'css', 'js'],
-    imageUrl: '/assets/img/mainImage.png',
+    imageUrls: [
+      '/assets/img/mainImage.png',
+      '/assets/img/image.png',
+      '/assets/img/mainImage.png',
+    ],
   },
   {
     title: 'Projeto React',
@@ -18,14 +22,22 @@ const steps: TimelineItem[] = [
       'Fiz esse projeto utilizando html, css e js para minha faculdade.',
     url: 'https://reactprojeto.com',
     languages: ['react', 'tailwind', 'typescript'],
-    imageUrl: '/assets/img/mainImage.png',
+    imageUrls: [
+      '/assets/img/mainImage.png',
+      '/assets/img/image.png',
+      '/assets/img/mainImage.png',
+    ],
   },
   {
     title: 'App Fullstack',
     description: 'Aplicação completa usando Next.js, Prisma e PostgreSQL.',
     url: 'https://appfullstack.com',
     languages: ['next.js', 'prisma', 'postgresql'],
-    imageUrl: '/assets/img/mainImage.png',
+    imageUrls: [
+      '/assets/img/mainImage.png',
+      '/assets/img/image.png',
+      '/assets/img/mainImage.png',
+    ],
   },
 ];
 
