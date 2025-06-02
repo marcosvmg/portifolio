@@ -3,6 +3,8 @@ import Main from './components/Main';
 import Experiencia from './components/Experiencia';
 import Formacao from './components/Formacao';
 import Contato from './components/Contato';
+import Footer from './components/Footer';
+
 
 export default function Page() {
   return (
@@ -12,7 +14,7 @@ export default function Page() {
       <Experiencia />
       <Formacao />
       <Contato />
-      <footer></footer>
+      <Footer />
     </div>
   );
 }
