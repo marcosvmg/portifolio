@@ -2,7 +2,7 @@ import Header from './components/Header';
 import Main from './components/Main';
 import Experiencia from './components/Experiencia';
 import Formacao from './components/Formacao';
-
+import Contato from './components/Contato';
 
 export default function Page() {
   return (
@@ -11,6 +11,7 @@ export default function Page() {
       <Main />
       <Experiencia />
       <Formacao />
+      <Contato />
       <footer></footer>
     </div>
   );

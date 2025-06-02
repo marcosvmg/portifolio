@@ -43,10 +43,9 @@ const steps: TimelineItem[] = [
 
 export default function Experiencia() {
   return (
-    <section className="w-full bg-c0 mt-10">
+    <section id="experiencia" className="w-full bg-c0 mt-10">
       <div className="w-full max-w-[1440px] flex gap-5 justify-center mx-auto px-4 md:px-8 py-20">
         <h2
-          id="experiencia"
           className="vertical-container vertical-rotated-left font-poppins font-semibold text-5xl sm:text-7xl md:text-9xl text-c1 text-right md:text-center leading-none"
         >
           EXPERIÊNCIA

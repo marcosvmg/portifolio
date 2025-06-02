@@ -2,14 +2,14 @@
 
 export default function Formacao() {
   return (
-    <section className="w-full bg-b py-12 md:py-20 px-4 sm:px-6 lg:px-20">
+    <section
+      id="formacao"
+      className="w-full bg-b py-12 md:py-20 px-4 sm:px-6 lg:px-20"
+    >
       {/* Container pai com alinhamento lado a lado em todas as telas */}
       <div className="flex flex-row items-center justify-between gap-4 w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10">
         {/* H2 com tamanho responsivo */}
-        <h2
-          id="formacao"
-          className="font-poppins font-semibold text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-8xl text-w leading-none flex-shrink"
-        >
+        <h2 className="font-poppins font-semibold text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-8xl text-w leading-none flex-shrink">
           FORMAÇÃO
         </h2>
 
@@ -283,8 +283,6 @@ export default function Formacao() {
             </p>
           </div>
         </div>
-
-
       </div>
 
       {/* Idiomas */}

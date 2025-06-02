@@ -1,17 +1,62 @@
 'use client';
-/* eslint-disable @next/next/no-img-element */
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
+  const controls = useAnimation();
+  const titleControls = useAnimation();
+  const wrapperControls = useAnimation();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname);
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
   useEffect(() => {
     if (isOpen) sidebarRef.current?.focus();
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      const isMobile = window.innerWidth < 768;
+
+      controls.start({
+        translateY: isScrolled ? 20 : 0,
+        transition: { duration: 0.15, ease: 'easeInOut' },
+      });
+
+      titleControls.start({
+        fontSize: isScrolled ? '2rem' : '2.25rem',
+        transition: { duration: 0.15, ease: 'easeInOut' },
+      });
+
+      wrapperControls.start({
+        width: isScrolled && !isMobile ? '50%' : '90%',
+        paddingTop: isScrolled ? (isMobile ? '0.1rem' : '0.8rem') : (isMobile ? '0.75rem' : '2rem'),
+        paddingBottom: isScrolled ? (isMobile ? '0.1rem' : '0.8rem') : (isMobile ? '0.75rem' : '1rem'),
+        paddingLeft: isMobile ? '1.5rem' : '2.5rem',
+        paddingRight: isMobile ? '1.5rem' : '2.5rem',
+        backgroundColor: isScrolled ? 'rgba(15, 13, 17, 0.75)' : 'rgba(0,0,0,0)',
+        transition: { duration: 0.15, ease: 'easeInOut' },
+      });
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [controls, titleControls, wrapperControls]);
 
   const toggleMenu = () => {
     if ('vibrate' in navigator) navigator.vibrate(10);
@@ -27,68 +72,87 @@ export default function Header() {
   ];
 
   return (
-    <header
-      className="w-full px-6 md:px-10  flex items-center justify-between relative z-50 container mx-auto pt-4 overflow-x-hidden overflow-y-hidden"
-      role="banner"
-    >
-      <div className="text-w font-gochi text-4xl md:text-7xl select-none">
-        <Link
-          href="/"
-          aria-label="Página inicial"
-          className="flex items-center gap-1"
-        >
-          Marcos<span className="text-amber-400">.</span>
-        </Link>
-      </div>
-
-      {/* Botão toggle mobile */}
-      <motion.button
-        aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
-        aria-expanded={isOpen}
-        aria-controls="mobile-menu"
-        className="md:hidden p-2 rounded focus:outline-none focus:ring-2 focus:ring-amber-400 text-w"
-        onClick={toggleMenu}
-        whileTap={{ rotate: isOpen ? -90 : 90, scale: 0.95 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        type="button"
+    <>
+      <motion.header
+        className={`w-full container mx-auto flex items-center justify-between z-50 sticky top-0 ${
+          isOpen ? 'blur-sm' : ''
+        }`}
+        animate={controls}
+        initial={{ translateY: 0 }}
+        role="banner"
       >
-        {isOpen ? <X size={28} /> : <Menu size={28} />}
-      </motion.button>
+        <motion.div
+          className="flex items-center justify-between w-full rounded-2xl backdrop-blur-md"
+          animate={wrapperControls}
+          initial={{
+            width: '90%',
+            paddingTop: '2rem',
+            paddingBottom: '1rem',
+            paddingLeft: '1.5rem',
+            paddingRight: '1.5rem',
+            backgroundColor: 'rgba(0,0,0,0)',
+          }}
+          style={{ marginLeft: 'auto', marginRight: 'auto' }}
+        >
+          <motion.div
+            className="text-w font-gochi md:text-7xl select-none"
+            animate={titleControls}
+            initial={{ fontSize: '2.25rem' }}
+          >
+            <Link href="/" aria-label="Página inicial" className="flex items-center gap-1">
+              Marcos<span className="text-amber-400">.</span>
+            </Link>
+          </motion.div>
 
-      {/* Navegação desktop */}
-      <nav className="hidden md:flex" aria-label="Menu principal">
-        <ul className="flex items-center space-x-6 select-none">
-          {navLinks.map(({ href, label }, i) => (
-            <li key={label} className="flex items-center space-x-2">
-              <Link
-                href={href}
-                className="font-semibold text-xl text-w hover:scale-95 hover:text-purple-500 transition-all duration-300"
-              >
-                {label}
-              </Link>
-              {i < navLinks.length - 1 && (
-                <img
-                  src="/assets/svg/dotGd2.svg"
-                  alt=""
-                  aria-hidden="true"
-                  width={8}
-                  height={8}
-                  className="inline-block"
-                />
-              )}
-            </li>
-          ))}
-        </ul>
-      </nav>
+          {/* Botão toggle mobile */}
+          <motion.button
+            aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
+            className="md:hidden p-2 rounded-2xl text-w"
+            onClick={toggleMenu}
+            whileTap={{ rotate: isOpen ? -90 : 90, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            type="button"
+          >
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </motion.button>
 
-      {/* Sidebar móvel */}
+          {/* Navegação desktop */}
+          <nav className="hidden md:flex" aria-label="Menu principal">
+            <ul className="flex items-center select-none">
+              {navLinks.map(({ href, label }, i) => (
+                <li key={label} className="flex items-center">
+                  <Link
+                    href={href}
+                    className="font-semibold text-xl text-w hover:scale-95 hover:text-purple-500 transition-all duration-300 mx-3"
+                  >
+                    {label}
+                  </Link>
+                  {i < navLinks.length - 1 && (
+                    <span aria-hidden="true" className="mx-3">
+                      <img
+                        src="/assets/svg/dotGd2.svg"
+                        alt=""
+                        width={8}
+                        height={8}
+                      />
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </motion.div>
+      </motion.header>
+
+      {/* Menu mobile */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Overlay */}
             <motion.div
               key="overlay"
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+              className="fixed inset-0 c3-b/40 backdrop-blur-sm z-40"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -96,15 +160,14 @@ export default function Header() {
               aria-hidden="true"
             />
 
-            {/* Sidebar */}
             <motion.aside
               key="sidebar"
               id="mobile-menu"
-              className="fixed top-0 right-0 h-full w-64 bg-[#0d0d0d] z-50 p-6 shadow-xl flex flex-col outline-none"
+              className="fixed top-0 right-0 h-full w-64 bg-b z-50 p-6 shadow-xl flex flex-col outline-none"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              transition={{ duration: 0.15, ease: 'easeInOut' }}
               tabIndex={-1}
               ref={sidebarRef}
               aria-label="Menu móvel"
@@ -143,6 +206,6 @@ export default function Header() {
           </>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
