@@ -46,11 +46,18 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
     steps.map(() => 0),
   );
 
-  // Calcula offsets dos títulos para os pontos verticais
   const calculateOffsets = () => {
     if (!wrapperRef.current) return;
     const wrapperTop = wrapperRef.current.getBoundingClientRect().top;
-    const offsets = titleRefs.current.map((el) => {
+
+    const offsets = titleRefs.current.map((el, idx) => {
+      // --- CORREÇÃO FINAL APLICADA AQUI ---
+      // Se for o primeiro item, fixa a posição em 18px.
+      // 18px é metade da altura do ícone (36px), compensando o `translateY(-50%)`
+      if (idx === 0) {
+        return 18;
+      }
+
       if (!el) return 24;
       const { top } = el.getBoundingClientRect();
       return top - wrapperTop - 17;
@@ -102,7 +109,7 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
     info: PanInfo,
     stepIndex: number,
   ) => {
-    const threshold = 30; // abaixei threshold pra ficar menos sensível
+    const threshold = 30;
     if (info.offset.x < -threshold) {
       goNext(stepIndex);
     } else if (info.offset.x > threshold) {
@@ -115,7 +122,6 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
       className="w-full flex px-4 md:px-10 py-10 bg-c1 rounded-2xl gap-6 relative select-none flex-col md:flex-row"
       ref={wrapperRef}
     >
-      {/* Linha e pontos verticais */}
       <div
         className="relative w-2 bg-c2 rounded-full hidden md:block"
         style={{
@@ -147,7 +153,14 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
 
       <ol className="flex flex-col flex-1 space-y-8 md:space-y-14">
         {steps.map((step, idx) => (
-          <li key={idx} className="relative flex flex-col">
+          <motion.li
+            key={idx}
+            className="relative flex flex-col"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
             <div className="flex items-center w-full mb-3">
               <h3
                 ref={(el) => {
@@ -186,26 +199,26 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
                   className="relative w-full h-24 md:h-30 overflow-hidden rounded-lg md:rounded-xl shadow-lg cursor-grab select-none"
                   drag="x"
                   dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.2} // suaviza o drag, menos sensível
+                  dragElastic={0.2}
                   onDragEnd={(e, info) => handleDragEnd(e, info, idx)}
                   whileTap={{ cursor: 'grabbing' }}
                 >
-                  <AnimatePresence initial={false} custom={currentIndexes[idx]}>
+                  <AnimatePresence initial={false} mode="wait">
                     <motion.img
                       key={currentIndexes[idx]}
                       src={step.imageUrls[currentIndexes[idx]]}
                       alt={`Imagem ${currentIndexes[idx]}`}
                       className="absolute top-0 left-0 w-full h-full object-cover"
                       draggable={false}
-                      initial={{ opacity: 0, x: 100 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -100 }}
-                      transition={{ duration: 0.5 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
                     />
                   </AnimatePresence>
 
                   <button
-                    className="absolute  left-1 top-1/2 -translate-y-1/2 z-10 p-2 rounded-2xl  hover:scale-90 transition-all duration-400  cursor-pointer "
+                    className="absolute  left-1 top-1/2 -translate-y-1/2 z-10 p-2 rounded-2xl  hover:scale-110 transition-transform duration-200  cursor-pointer "
                     onClick={() => goPrev(idx)}
                     aria-label="Imagem anterior"
                     type="button"
@@ -218,7 +231,7 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
                     />
                   </button>
                   <button
-                    className="absolute  right-1 top-1/2 -translate-y-1/2 z-10 p-2 rounded-2xl  hover:scale-90 transition-all duration-400  cursor-pointer "
+                    className="absolute  right-1 top-1/2 -translate-y-1/2 z-10 p-2 rounded-2xl  hover:scale-110 transition-transform duration-200  cursor-pointer "
                     onClick={() => goNext(idx)}
                     aria-label="Próxima imagem"
                     type="button"
@@ -230,11 +243,8 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
                       height={24}
                     />
                   </button>
-
-                  {/* Bolinhas indicadoras: movi pra fora do container da imagem para ficar abaixo */}
                 </motion.div>
 
-                {/* Container das bolinhas abaixo da imagem */}
                 <div className="flex justify-center gap-2 mt-3">
                   {step.imageUrls.map((_, i) => (
                     <button
@@ -255,7 +265,7 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
                 href={step.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 md:gap-4 bg-b py-2 md:py-3 px-3 md:px-6 text-sm md:text-2xl font-semibold font-poppins rounded-lg md:rounded-xl hover:scale-95 active:scale-90 transition-all duration-300 w-full md:w-fit justify-center order-2 md:order-1"
+                className="flex items-center gap-2 md:gap-4 bg-b py-2 md:py-3 px-3 md:px-6 text-sm md:text-2xl font-semibold font-poppins rounded-lg md:rounded-xl hover:scale-105 active:scale-90 transition-transform duration-300 w-full md:w-fit justify-center order-2 md:order-1"
               >
                 VISITE O SITE
                 <img
@@ -266,7 +276,7 @@ const Timeline: React.FC<TimelineProps> = ({ steps }) => {
                 />
               </Link>
             </div>
-          </li>
+          </motion.li>
         ))}
       </ol>
     </div>

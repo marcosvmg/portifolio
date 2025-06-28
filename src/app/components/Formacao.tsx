@@ -1,344 +1,193 @@
-/* eslint-disable @next/next/no-img-element */
+'use client';
 
+import Image from 'next/image';
+import { useState, useEffect, useRef } from 'react';
+import { EducationCard, EducationItem } from './EducationCard'; // Assumindo que EducationCard está em seu próprio arquivo
+import { motion, AnimatePresence } from 'framer-motion';
+
+// --- Dados para os cards ---
+const graduacaoData: EducationItem[] = [
+  {
+    type: 'Ensino Superior',
+    course: 'Desenvolvimento de Software Multiplataforma',
+    institution: 'FATEC-PG, 2024 - 2027',
+    status: 'Cursando',
+  },
+  {
+    type: 'Ensino Técnico',
+    course: 'Desenvolvimento de Sistemas',
+    institution: 'ETEC-PG, 2021 - 2022',
+    status: 'Completo',
+  },
+];
+
+const cursosData: EducationItem[] = [
+  {
+    type: 'UX/UI Design',
+    course: 'UX Unicórnio',
+    institution: 'Leandro Rezende, 2023',
+    status: 'Completo',
+  },
+  {
+    type: 'Front-end',
+    course: 'React com TypeScript',
+    institution: 'Origamid, 2024',
+    status: 'Completo',
+  },
+  {
+    type: 'Design',
+    course: 'UI Design para Iniciantes',
+    institution: 'Origamid, 2023',
+    status: 'Completo',
+  },
+  {
+    type: 'Front-end',
+    course: 'HTML e CSS para Iniciantes',
+    institution: 'Origamid, 2023',
+    status: 'Completo',
+  },
+  {
+    type: 'Banco de Dados',
+    course: 'Oracle SQL',
+    institution: 'Udemy, 2022',
+    status: 'Completo',
+  },
+  {
+    type: 'Back-end',
+    course: 'C# Essencial',
+    institution: 'Udemy, 2021',
+    status: 'Completo',
+  },
+  {
+    type: 'Metodologia',
+    course: 'Scrum para Iniciantes',
+    institution: 'Scrum.org, 2023',
+    status: 'Completo',
+  },
+  {
+    type: 'Ferramentas',
+    course: 'Figma para Devs',
+    institution: 'Origamid, 2024',
+    status: 'Completo',
+  },
+];
+
+const idiomasData: EducationItem[] = [
+    {
+      type: 'Inglês',
+      course: 'Avançado (C1)',
+      institution: 'Autodidata & Experiência Profissional',
+      status: 'Completo',
+    },
+    {
+      type: 'Espanhol',
+      course: 'Básico (A2)',
+      institution: 'Cultura Espanhola, 2019',
+      status: 'Completo',
+    },
+];
+
+// --- Hook e Componentes Auxiliares ---
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mediaQuery.matches);
+    const handleMediaQueryChange = (event: MediaQueryListEvent) => setIsMobile(event.matches);
+    mediaQuery.addEventListener('change', handleMediaQueryChange);
+    return () => mediaQuery.removeEventListener('change', handleMediaQueryChange);
+  }, []);
+  return isMobile;
+};
+
+const LegendItem = ({ label, status }: { label: string; status: 'Cursando' | 'Completo' }) => (
+  <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-xl bg-c0 p-1 text-xs font-poppins text-c3 xs:gap-2 xs:rounded-2xl xs:p-2 xs:text-sm sm:text-base">
+    <Image src={status === 'Cursando' ? '/assets/svg/dotCursando.svg' : '/assets/svg/dotCompleto.svg'} alt="" width={16} height={16} className="h-2 w-2 flex-shrink-0 md:h-4 md:w-4" aria-hidden="true" />
+    {label}
+  </span>
+);
+
+const ToggleButton = ({ onClick, isExpanded }: { onClick: () => void; isExpanded: boolean }) => (
+    <div className="mt-8 flex w-full justify-center">
+        <motion.button onClick={onClick} className="flex items-center gap-2 font-poppins text-lg text-c3 transition-colors hover:text-w" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            {isExpanded ? 'Mostrar menos' : 'Mostrar mais'}
+            <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.3 }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 5V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M6 13L12 19L18 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+            </motion.div>
+        </motion.button>
+    </div>
+);
+
+const EducationSection = ({ title, data, initialCount }: { title: string; data: EducationItem[]; initialCount: number }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const sectionTitleRef = useRef<HTMLHeadingElement>(null);
+    const displayedItems = isExpanded ? data : data.slice(0, initialCount);
+
+    const chunkedItems = [];
+    for (let i = 0; i < displayedItems.length; i += 2) {
+        chunkedItems.push(displayedItems.slice(i, i + 2));
+    }
+
+    const handleToggle = () => {
+        if (isExpanded && sectionTitleRef.current) {
+            setTimeout(() => {
+                sectionTitleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 150);
+        }
+        setIsExpanded(prev => !prev);
+    };
+
+    return (
+        <div className="mx-auto mt-16 w-full max-w-[1820px] px-4 sm:px-6 lg:px-12">
+            <h3 ref={sectionTitleRef} className="mb-10 font-poppins text-3xl font-medium text-w sm:text-4xl lg:text-5xl scroll-mt-24">
+                {title}
+            </h3>
+            <div className='flex flex-col gap-6 lg:gap-8'>
+                <AnimatePresence>
+                    {chunkedItems.map((pair, rowIndex) => (
+                        <div key={rowIndex} className="flex flex-col justify-center gap-6 md:flex-row lg:gap-8">
+                            {pair.map((item, cardIndex) => (
+                                <EducationCard key={`${item.course}-${cardIndex}`} item={item} />
+                            ))}
+                        </div>
+                    ))}
+                </AnimatePresence>
+            </div>
+            {data.length > initialCount && (
+                <ToggleButton onClick={handleToggle} isExpanded={isExpanded} />
+            )}
+        </div>
+    );
+};
+
+// --- COMPONENTE PRINCIPAL ---
 export default function Formacao() {
+  const isMobile = useIsMobile();
+
+  const initialCountGraduacao = isMobile ? 2 : 4;
+  const initialCountCursos = isMobile ? 2 : 6;
+  const initialCountIdiomas = isMobile ? 2 : 4;
+
   return (
-    <section
-      id="formacao"
-      className="w-full bg-b py-12 md:py-20 px-4 sm:px-6 lg:px-20"
-    >
-      {/* Container pai com alinhamento lado a lado em todas as telas */}
-      <div className="flex flex-row items-center justify-between gap-4 w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10">
-        {/* H2 com tamanho responsivo */}
-        <h2 className="font-poppins font-semibold text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-8xl text-w leading-none flex-shrink">
+    <section id="formacao" className="w-full bg-b px-4 py-20 sm:px-6 lg:px-20">
+      <div className="mx-auto flex w-full max-w-[1920px] flex-row items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
+        <h2 className="flex-shrink font-poppins text-4xl font-semibold leading-none text-w sm:text-5xl md:text-6xl lg:text-8xl">
           FORMAÇÃO
         </h2>
-
-        {/* Dots compactos e alinhados ao lado */}
-        <div className="flex flex-col gap-1 xs:gap-2 md:gap-4 lg:gap-6 flex-shrink-0">
-          <span className="inline-flex items-center gap-1 xs:gap-2 rounded-xl xs:rounded-2xl font-poppins text-c3 bg-c0 p-1 xs:p-2 text-xs xs:text-sm sm:text-base whitespace-nowrap">
-            <img
-              src="/assets/svg/dotCursando.svg"
-              alt=""
-              className="flex-shrink-0  w-2 h-2 md:w-4 md:h-4"
-            />
-            Cursando
-          </span>
-          <span className="inline-flex items-center gap-1 xs:gap-2 rounded-xl xs:rounded-2xl font-poppins text-c3 bg-c0 p-1 xs:p-2 text-xs xs:text-sm sm:text-base whitespace-nowrap">
-            <img
-              src="/assets/svg/dotCompleto.svg"
-              alt=""
-              className="flex-shrink-0  w-2 h-2 md:w-4 md:h-4"
-            />
-            Completo
-          </span>
+        <div className="flex flex-shrink-0 flex-col gap-2 md:gap-4">
+          <LegendItem label="Cursando" status="Cursando" />
+          <LegendItem label="Completo" status="Completo" />
         </div>
       </div>
 
-      {/* Graduação */}
-      <div className="mx-auto mt-10 sm:mt-16 px-4 sm:px-6 lg:px-12 w-full max-w-[1820px]">
-        <h3 className="font-poppins font-medium text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-w mb-6 sm:mb-10">
-          Graduação:
-        </h3>
-
-        <div className="flex flex-col md:flex-row gap-2 sm:gap-4 md:gap-6 lg:gap-8 mb-2 lg:mb-8  justify-center">
-          {/* Card 1 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCursando.svg"
-                alt="Cursando"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCompleto.svg"
-                alt="Completo"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Cursos Complementares */}
-      <div className="mx-auto mt-10 sm:mt-16 px-4 sm:px-6 lg:px-12 w-full max-w-[1820px]">
-        <h3 className="font-poppins font-medium text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-w mb-6 sm:mb-10">
-          Cursos Complementares:
-        </h3>
-
-        <div className="flex flex-col md:flex-row gap-2 sm:gap-4 md:gap-6 lg:gap-8 mb-2 lg:mb-8 justify-center ">
-          {/* Card 1 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCursando.svg"
-                alt="Cursando"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCompleto.svg"
-                alt="Completo"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-2 sm:gap-4 md:gap-6 lg:gap-8 mb-2 lg:mb-8 justify-center ">
-          {/* Card 1 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCursando.svg"
-                alt="Cursando"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCompleto.svg"
-                alt="Completo"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-2 sm:gap-4 md:gap-6 lg:gap-8 mb-2 lg:mb-8 justify-center ">
-          {/* Card 1 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCursando.svg"
-                alt="Cursando"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCompleto.svg"
-                alt="Completo"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-2 sm:gap-4 md:gap-6 lg:gap-8 mb-2 lg:mb-8 justify-center ">
-          {/* Card 1 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCursando.svg"
-                alt="Cursando"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCompleto.svg"
-                alt="Completo"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Idiomas */}
-      <div className="mx-auto mt-10 sm:mt-16 px-4 sm:px-6 lg:px-12 w-full max-w-[1820px]">
-        <h3 className="font-poppins font-medium text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-w mb-6 sm:mb-10">
-          Idiomas:
-        </h3>
-
-        <div className="flex flex-col md:flex-row gap-2 sm:gap-4 md:gap-6 lg:gap-8 mb-2lgd:mb- 8justify-center">
-          {/* Card 1 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCursando.svg"
-                alt="Cursando"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-c0 p-4 sm:p-5 md:p-6 rounded-xl shadow-md flex flex-col gap-3 sm:gap-4 w-full md:w-1/2">
-            <div className="flex justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-c3 text-xl sm:text-2xl md:text-3xl font-semibold">
-                  Ensino Superior
-                  <div className="w-full h-1 bg-[#54505A]/25 rounded mt-1" />
-                </h3>
-              </div>
-              <img
-                src="/assets/svg/dotCompleto.svg"
-                alt="Completo"
-                className="md:w-9 md:h-9 w-5 h-5 -mr-2 md:-mr-4 -mt-2 md:-mt-8 flex-shrink-0"
-              />
-            </div>
-            <h4 className="text-w font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-              Desenvolvimento de Software Multiplataforma
-            </h4>
-            <p className="text-c3 text-base sm:text-lg md:text-xl lg:text-2xl">
-              FATEC-PG, 2024 - 2027
-            </p>
-          </div>
-        </div>
-      </div>
+      <EducationSection title="Graduação e Técnico" data={graduacaoData} initialCount={initialCountGraduacao} />
+      <EducationSection title="Cursos Complementares" data={cursosData} initialCount={initialCountCursos} />
+      <EducationSection title="Idiomas" data={idiomasData} initialCount={initialCountIdiomas} />
     </section>
   );
 }
