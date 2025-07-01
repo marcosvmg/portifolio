@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-const useSidebarEffects = (isOpen: boolean, sidebarRef: RefObject<HTMLElement | null>) => {
+const useSidebarEffects = (
+  isOpen: boolean,
+  sidebarRef: RefObject<HTMLElement | null>,
+) => {
   useEffect(() => {
     const originalOverflow = window.getComputedStyle(document.body).overflow;
     if (isOpen) {
@@ -12,9 +15,10 @@ const useSidebarEffects = (isOpen: boolean, sidebarRef: RefObject<HTMLElement | 
     }
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Tab' && sidebarRef.current) {
-        const focusableElements = sidebarRef.current.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), textarea, input, select'
-        );
+        const focusableElements =
+          sidebarRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), textarea, input, select',
+          );
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
         if (event.shiftKey) {
@@ -48,7 +52,11 @@ const NAV_LINKS = [
 ];
 
 const Logo = () => (
-  <Link href="/" aria-label="Página inicial" className="flex items-center gap-1">
+  <Link
+    href="/"
+    aria-label="Página inicial"
+    className="flex items-center gap-1"
+  >
     Marcos<span className="text-amber-400">.</span>
   </Link>
 );
@@ -72,14 +80,16 @@ export default function Header({ isMenuOpen, setIsMenuOpen }: HeaderProps) {
 
   return (
     <>
-      <header className="w-full sticky top-0 z-40 py-4 bg-transparent">
+      {/* O container principal do header agora é sticky e ocupa toda a largura */}
+      <header className="w-full fixed top-0 left-0 z-50 py-4 bg-transparent">
+        {/* Este div interno agora contém as classes de largura e arredondamento */}
         <div
           className={`
             flex items-center justify-between
             w-11/12 md:w-5/6 lg:w-4/5 xl:w-3/4
             mx-auto px-6 py-4
             rounded-2xl
-            bg-gray-950/70
+            bg-zinc-950/70
             backdrop-blur-lg
           `}
         >
@@ -147,7 +157,7 @@ export default function Header({ isMenuOpen, setIsMenuOpen }: HeaderProps) {
 
       <AnimatePresence>
         {isMenuOpen && (
-           <>
+          <>
             <motion.div
               key="overlay"
               className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
@@ -201,7 +211,7 @@ export default function Header({ isMenuOpen, setIsMenuOpen }: HeaderProps) {
                 </ul>
               </nav>
             </motion.aside>
-         </>
+          </>
         )}
       </AnimatePresence>
     </>

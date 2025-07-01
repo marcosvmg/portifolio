@@ -1,49 +1,104 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LoaderCircle, CheckCircle, AlertTriangle, Send } from 'lucide-react';
+
+type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
+
+// Componente auxiliar para o conteúdo dinâmico do botão com ícones filled
+const ButtonContent = ({ status }: { status: SubmissionStatus }) => {
+  switch (status) {
+    case 'submitting':
+      return (
+        <>
+          <LoaderCircle size={20} className="animate-spin" />
+          <span>ENVIANDO...</span>
+        </>
+      );
+    case 'success':
+      return (
+        <>
+          <CheckCircle size={22} className="text-amber-400" />
+          <span>ENVIADA!</span>
+        </>
+      );
+    case 'error':
+      return (
+        <>
+          <AlertTriangle size={20} className="text-red-500/90" />
+          <span>TENTE NOVAMENTE</span>
+        </>
+      );
+    default:
+      return (
+        <>
+          <span>ENVIAR MENSAGEM</span>
+          <Send size={18} />
+        </>
+      );
+  }
+};
 
 export default function Contato() {
-  // --- ESTADO PARA OS CAMPOS DO FORMULÁRIO ---
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-
-  // --- ESTADO PARA O FEEDBACK DE ENVIO ---
-  type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
-  const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>('idle');
+  const [submissionStatus, setSubmissionStatus] =
+    useState<SubmissionStatus>('idle');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Impede o recarregamento da página
+    event.preventDefault();
     setSubmissionStatus('submitting');
 
-    // --- SIMULAÇÃO DE ENVIO PARA API ---
-    // Em um projeto real, você faria uma chamada `fetch` aqui para sua API
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simula 2s de espera
+    const formData = { name, email, message };
 
-    // Simulação de sucesso. Mude para 'error' para testar o estado de erro.
-    const success = true;
+    try {
+      const response = await fetch('https://formspree.io/f/mldnzygz', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    if (success) {
-      setSubmissionStatus('success');
-      setName('');
-      setEmail('');
-      setMessage('');
-    } else {
+      if (response.ok) {
+        setSubmissionStatus('success');
+        setName('');
+        setEmail('');
+        setMessage('');
+        setTimeout(() => setSubmissionStatus('idle'), 4000);
+      } else {
+        setSubmissionStatus('error');
+        setTimeout(() => setSubmissionStatus('idle'), 4000);
+      }
+    } catch (error) {
+      console.error('Submit Error:', error);
       setSubmissionStatus('error');
+      setTimeout(() => setSubmissionStatus('idle'), 4000);
     }
   };
 
-  // Helper para o texto do botão
-  const getButtonText = () => {
+  // Função auxiliar para definir as classes do botão com base no status
+  const getButtonClassName = () => {
+    const baseClasses = `self-end rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300
+                        md:px-8 md:text-2xl font-poppins flex items-center justify-center gap-2 min-w-[300px] h-[68px] md:h-[76px]`;
+
+    let stateClasses = '';
+    if (submissionStatus === 'submitting' || submissionStatus === 'success') {
+      stateClasses += ' cursor-not-allowed';
+    } else {
+      stateClasses += ' hover:-translate-y-1 active:scale-95';
+    }
+
     switch (submissionStatus) {
-      case 'submitting':
-        return 'ENVIANDO...';
       case 'success':
-        return 'MENSAGEM ENVIADA!';
+        return `${baseClasses} ${stateClasses} bg-c1 border-2 border-amber-400 text-amber-400`;
       case 'error':
-        return 'ERRO, TENTE NOVAMENTE';
+        return `${baseClasses} ${stateClasses} bg-c1 border-2 border-red-500/60 text-red-500/90`;
       default:
-        return 'ENVIAR MENSAGEM';
+        return `${baseClasses} ${stateClasses} bg-linear-90 from-[#7A37FF] to-[#4D17B8] text-w`;
     }
   };
 
@@ -56,45 +111,54 @@ export default function Contato() {
         <h2 className="font-poppins text-3xl font-semibold leading-none text-w text-right xs:text-4xl sm:text-5xl md:text-6xl lg:text-8xl">
           CONTATO
         </h2>
-
         <div className="flex flex-col justify-between gap-10 md:flex-row md:gap-16 lg:gap-20">
           <div className="flex flex-col gap-6 text-base text-c3 sm:text-lg md:text-xl lg:text-2xl">
             <p>
-              Estou disponível para novos projetos, colaborações e oportunidades. Sinta-se à vontade para me chamar via e-mail ou redes sociais.
+              Estou disponível para novos projetos, colaborações e
+              oportunidades. Sinta-se à vontade para me chamar via e-mail ou
+              redes sociais.
             </p>
             <div className="flex flex-col gap-2">
               <span className="font-semibold text-w">Email:</span>
-              <a href="mailto:seuemail@dominio.com" className="hover:underline">
-                seuemail@dominio.com
+              <a
+                href="mailto:devmarcosvmg@gmail.com"
+                className="hover:underline"
+              >
+                devmarcosvmg@gmail.com
               </a>
             </div>
             <div className="flex flex-col gap-2">
               <span className="font-semibold text-w">LinkedIn:</span>
               <a
-                href="https://www.linkedin.com/in/seu-perfil"
+                href="https://www.linkedin.com/in/marcosvmg/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
               >
-                linkedin.com/in/seu-perfil
+                linkedin.com/in/marcosvmg/
               </a>
             </div>
             <div className="flex flex-col gap-2">
               <span className="font-semibold text-w">GitHub:</span>
               <a
-                href="https://github.com/seuusuario"
+                href="https://github.com/marcosvmg"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
               >
-                github.com/seuusuario
+                github.com/marcosvmg
               </a>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex w-full max-w-xl flex-col gap-4">
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full max-w-xl flex-col gap-4"
+          >
             <div>
-              <label htmlFor="name" className="sr-only">Seu nome</label>
+              <label htmlFor="name" className="sr-only">
+                Seu nome
+              </label>
               <input
                 id="name"
                 name="name"
@@ -108,7 +172,9 @@ export default function Contato() {
               />
             </div>
             <div>
-              <label htmlFor="email" className="sr-only">Seu email</label>
+              <label htmlFor="email" className="sr-only">
+                Seu email
+              </label>
               <input
                 id="email"
                 name="email"
@@ -122,7 +188,9 @@ export default function Contato() {
               />
             </div>
             <div>
-              <label htmlFor="message" className="sr-only">Sua mensagem</label>
+              <label htmlFor="message" className="sr-only">
+                Sua mensagem
+              </label>
               <textarea
                 id="message"
                 name="message"
@@ -134,20 +202,30 @@ export default function Contato() {
                 onChange={(e) => setMessage(e.target.value)}
               />
             </div>
-            <button
+
+            <motion.button
               type="submit"
-              className={`
-                self-end rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300
-                md:px-8 md:text-2xl font-poppins
-                ${submissionStatus === 'success' ? 'bg-green-600' : ''}
-                ${submissionStatus === 'error' ? 'bg-red-600' : ''}
-                ${submissionStatus === 'idle' || submissionStatus === 'submitting' ? 'bg-linear-90 from-[#7A37FF] to-[#4D17B8]' : ''}
-                ${submissionStatus === 'submitting' || submissionStatus === 'success' ? 'cursor-not-allowed' : 'hover:-translate-y-1 active:scale-95'}
-              `}
-              disabled={submissionStatus === 'submitting' || submissionStatus === 'success'}
+              layout
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className={getButtonClassName()}
+              disabled={
+                submissionStatus === 'submitting' ||
+                submissionStatus === 'success'
+              }
             >
-              {getButtonText()}
-            </button>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={submissionStatus}
+                  initial={{ opacity: 0, y: -15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 15 }}
+                  transition={{ duration: 0.25 }}
+                  className="flex items-center gap-3"
+                >
+                  <ButtonContent status={submissionStatus} />
+                </motion.div>
+              </AnimatePresence>
+            </motion.button>
           </form>
         </div>
       </div>

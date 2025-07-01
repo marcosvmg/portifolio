@@ -17,7 +17,7 @@ export default function Main() {
   ];
 
   return (
-    <main className="container mx-auto flex flex-col items-center gap-4 px-4 py-4">
+    <main className="container mx-auto flex flex-col items-center gap-4 px-4 py-4 mt-[96px]">
       <div className="flex w-full max-w-full flex-col gap-4 rounded-2xl bg-c0 p-4 md:flex-row md:gap-6 md:p-10">
         {/* Imagem Principal */}
         <div className="relative h-64 w-full min-w-0 md:h-auto md:flex-1">
@@ -62,25 +62,39 @@ export default function Main() {
               CONTATO
             </Link>
 
-            <Link href="#experiencia" aria-label="Rolar para a seção de experiência" className="md:hidden mt-4 text-c1">
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" aria-hidden="true">
+            <Link
+              href="#experiencia"
+              aria-label="Rolar para a seção de experiência"
+              className="md:hidden mt-4 text-c1"
+            >
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 48 48"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-7 w-7"
+                aria-hidden="true"
+              >
                 <title>Rolar para a próxima seção</title>
-                <path d="M24 8V40" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/>
-                <path d="M12 32L24 44L36 32" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                <path
+                  d="M24 8V40"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M12 32L24 44L36 32"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </Link>
           </div>
         </div>
       </div>
-
-      {/* Seta Fixa para Desktop */}
-      <Link href="#experiencia" aria-label="Rolar para a seção de experiência" className="hidden md:block fixed left-4 bottom-4 z-50 text-c1 transition-transform hover:scale-110">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" aria-hidden="true">
-            <title>Rolar para a próxima seção</title>
-            <path d="M24 8V40" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/>
-            <path d="M12 32L24 44L36 32" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-      </Link>
 
       {/* Seção de Conhecimentos */}
       <div className="py-2">

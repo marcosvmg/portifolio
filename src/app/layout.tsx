@@ -1,6 +1,8 @@
+// src/app/layout.tsx
 import type { Metadata } from 'next';
 import { Gochi_Hand, Open_Sans, Poppins } from 'next/font/google';
 import './globals.css';
+import PageLoader from './components/PageLoader'; // 👈 IMPORTE O NOVO COMPONENTE
 
 const gochiHand = Gochi_Hand({
   variable: '--font-gochi-hand',
@@ -31,16 +33,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className='scroll-smooth'>
+    <html lang="pt-BR" className='scroll-smooth'>
       <body
         className={`
           ${gochiHand.variable}
           ${openSans.variable}
           ${poppins.variable}
           antialiased bg-b noise-[128,50,5]
+          select-none
         `}
       >
-        {children}
+        <PageLoader>{children}</PageLoader>
       </body>
     </html>
   );
