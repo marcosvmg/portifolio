@@ -7,6 +7,7 @@ import Formacao from './components/Formacao';
 import Contato from './components/Contato';
 import Footer from './components/Footer';
 
+
 export default function HomePage() {
   // 1. O estado é criado aqui, no componente pai.
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,6 +20,7 @@ export default function HomePage() {
         />
       <Main />
       <Experiencia />
+
       <Formacao />
       <Contato />
       <Footer />
