@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LoaderCircle, CheckCircle, AlertTriangle, Send } from 'lucide-react';
+import { LoaderCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 
 type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -34,7 +34,7 @@ const ButtonContent = ({ status }: { status: SubmissionStatus }) => {
       return (
         <>
           <span>ENVIAR MENSAGEM</span>
-          <Send size={18} />
+          <svg className='h-5 w-5 text-violet-400' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M176.57-172.83q-26.79 11.4-50.44-4.34t-23.65-44.53v-162.47l346-95.83-346-95.83V-738.3q0-28.79 23.65-44.53 23.65-15.74 50.44-4.34l610.34 258.3q32.35 14.39 32.35 48.87t-32.35 48.87l-610.34 258.3Z"/></svg>
         </>
       );
   }

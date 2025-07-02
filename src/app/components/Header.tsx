@@ -80,9 +80,7 @@ export default function Header({ isMenuOpen, setIsMenuOpen }: HeaderProps) {
 
   return (
     <>
-      {/* O container principal do header agora é sticky e ocupa toda a largura */}
       <header className="w-full fixed top-0 left-0 z-50 py-4 bg-transparent">
-        {/* Este div interno agora contém as classes de largura e arredondamento */}
         <div
           className={`
             flex items-center justify-between
@@ -143,9 +141,13 @@ export default function Header({ isMenuOpen, setIsMenuOpen }: HeaderProps) {
                     {label}
                   </Link>
                   {i < NAV_LINKS.length - 1 && (
-                    <span
+                    <img
+                      src="/assets/svg/dotGd2.svg"
+                      alt=""
+                      width={8}
+                      height={8}
+                      className="mx-3"
                       aria-hidden="true"
-                      className="mx-3 inline-block h-2 w-2 rounded-full bg-amber-400"
                     />
                   )}
                 </li>
@@ -184,12 +186,11 @@ export default function Header({ isMenuOpen, setIsMenuOpen }: HeaderProps) {
                 <div className="text-w font-gochi text-3xl select-none">
                   <Logo />
                 </div>
-                {/* --- CORREÇÃO APLICADA AQUI --- */}
                 <motion.button
                   aria-label="Fechar menu"
                   className="text-w"
                   onClick={closeMenu}
-                  whileTap={{ scale: 0.9 }} // Apenas um efeito de escala suave, sem rotação.
+                  whileTap={{ scale: 0.9 }}
                   type="button"
                 >
                   <X size={28} />

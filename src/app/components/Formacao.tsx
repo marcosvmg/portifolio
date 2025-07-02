@@ -26,17 +26,41 @@ const graduacaoData: EducationItem[] = [
 const cursosData: EducationItem[] = [
   {
     type: 'UX/UI Design',
-    course: 'UX Unicórnio',
-    institution: 'Leandro Rezende, 2023',
+    course: 'Front-end & UX/UI Design',
+    institution: 'Origamid, 2023',
     status: 'Completo',
-    certificateImgUrl: '/certificados/ux-unicornio.png',
+    certificateImgUrl: '/assets/img/certificados/frontenduxui.png'
+  },
+  {
+    type: 'UX/UI Design',
+    course: 'UI Design Avançado',
+    institution: 'Origamid, 2023',
+    status: 'Completo',
+    certificateImgUrl: '/assets/img/certificados/uiavancado.png'
+  },
+  {
+    type: 'UX/UI Design',
+    course: 'UI Design Iniciante',
+    institution: 'Origamid, 2023',
+    status: 'Completo',
+    certificateImgUrl: '/assets/img/certificados/uiiniciante.png'
+  },
+
+  {
+    type: 'Front-end',
+    course: 'CSS Grid',
+    institution: 'Origamid, 2024',
+    status: 'Completo',
+    certificateImgUrl: '/assets/img/certificados/cssgrid.png'
+
   },
   {
     type: 'Front-end',
-    course: 'React com TypeScript',
+    course: 'CSS FlexBox',
     institution: 'Origamid, 2024',
     status: 'Completo',
-    certificateImgUrl: '/certificados/react-origamid.png',
+    certificateImgUrl: '/assets/img/certificados/cssflexbox.png'
+
   },
   //... restante dos seus cursos
 ];

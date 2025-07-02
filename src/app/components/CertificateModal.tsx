@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
 import Image from 'next/image';
 
 interface CertificateModalProps {
@@ -29,22 +28,35 @@ export const CertificateModal = ({
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-2xl">
+        <div className="relative inline-block rounded-lg overflow-hidden shadow-2xl bg-zinc-900">
           <Image
             src={imgUrl}
             alt="Imagem do Certificado"
-            fill // 'fill' é mais moderno que 'layout="fill"'
-            className="object-contain bg-zinc-900"
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="w-auto h-auto max-w-full max-h-[70vh] rounded-lg"
+            style={{ display: 'block' }}
           />
         </div>
       </motion.div>
 
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 bg-white/10 text-white p-2 rounded-full z-10 hover:bg-white/20 transition-colors"
+        className="absolute top-4 right-4 bg-zinc-700/40 text-zinc-50 p-2 rounded-full z-10 hover:bg-zinc-500/40 transition-colors duration-300 cursor-pointer"
         aria-label="Fechar modal"
+        type="button"
       >
-        <X size={24} />
+        <svg
+          className="h-6 w-6 text-white"
+          fill="currentColor"
+          viewBox="0 -960 960 960"
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          width="24px"
+        >
+          <path d="M480-405.91 293.04-218.96Q278.09-204 256-204t-37.04-14.96Q204-233.91 204-256t14.96-37.04L405.91-480 218.96-666.96Q204-681.91 204-704t14.96-37.04Q233.91-756 256-756t37.04 14.96L480-554.09l186.96-186.95Q681.91-756 704-756t37.04 14.96Q756-726.09 756-704t-14.96 37.04L554.09-480l186.95 186.96Q756-278.09 756-256t-14.96 37.04Q726.09-204 704-204t-37.04-14.96L480-405.91Z" />
+        </svg>
       </button>
     </motion.div>
   );
