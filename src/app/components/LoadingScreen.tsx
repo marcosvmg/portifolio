@@ -2,23 +2,6 @@
 
 import { motion } from 'framer-motion';
 
-// A palavra que será animada
-const word = "Marcos";
-// Divide a palavra em um array de letras
-const letters = word.split("");
-
-// Animação para o contêiner principal, para orquestrar a entrada das letras
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1, // Atraso de 0.1s entre cada letra
-    },
-  },
-};
-
-// Animação para cada letra individual
 const letterVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -32,7 +15,16 @@ const letterVariants = {
   },
 };
 
-// Animação especial para o ponto final
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
 const dotVariants = {
     hidden: { opacity: 0, scale: 0 },
     visible: {
@@ -42,22 +34,22 @@ const dotVariants = {
             type: 'spring',
             stiffness: 400,
             damping: 15,
-            delay: letters.length * 0.1 + 0.2,
+            delay: "Marcos".length * 0.1 + 0.2,
         }
     }
 }
 
 export default function LoadingScreen() {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#10101A] text-white">
-      {/* Logo Animada */}
+    // ALTERAÇÃO AQUI: Fundo semi-transparente com backdrop-blur
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#10101A]/80 backdrop-blur-md text-white">
       <motion.h1
-        className="flex items-center text-9xl md:text-9xl font-gochi"
+        className="flex items-center text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-gochi"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {letters.map((letter, index) => (
+        {"Marcos".split("").map((letter, index) => (
           <motion.span key={index} variants={letterVariants}>
             {letter}
           </motion.span>
@@ -70,14 +62,13 @@ export default function LoadingScreen() {
         </motion.span>
       </motion.h1>
 
-      {/* NOVO: Subtítulo animado */}
       <motion.p
-        className=" text-lg md:text-xl font-sans tracking-widest text-zinc-600"
+        className="mt-2 text-sm sm:text-base md:text-lg font-sans tracking-widest text-zinc-400"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, ease: 'easeInOut', delay: letters.length * 0.1 + 0.6 }}
+        transition={{ duration: 0.8, ease: 'easeInOut', delay: "Marcos".length * 0.1 + 0.6 }}
       >
-        Boas vindas ao meu portfólio.
+        Bem-vindo ao meu portfólio
       </motion.p>
     </div>
   );

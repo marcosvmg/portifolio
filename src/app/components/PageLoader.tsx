@@ -13,20 +13,26 @@ export default function PageLoader({ children }: { children: React.ReactNode }) 
   }, []);
 
   return (
-    <>
-      <AnimatePresence>
-        {isLoading && (
-          <motion.div
-            key="loader"
-            exit={{ y: '-100vh' }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <LoadingScreen />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {/* Agora, o conteúdo é renderizado diretamente quando o loading termina */}
-      {!isLoading && children}
-    </>
+    <AnimatePresence>
+      {isLoading ? (
+        <motion.div
+          key="loader"
+          // ALTERAÇÃO AQUI: A animação de saída agora é um fade-out
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
+        >
+          <LoadingScreen />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
