@@ -17,7 +17,7 @@ export default function Main() {
   ];
 
   return (
-    <main className="container mx-auto flex flex-col items-center gap-4 px-4 py-4 mt-[96px]">
+    <main className="container mx-auto flex flex-col items-center gap-4 px-4 py-4 mt-[96px] ">
       <div className="flex w-full max-w-full flex-col gap-4 rounded-2xl bg-c0 p-4 md:flex-row md:gap-6 md:p-10">
         {/* Imagem Principal */}
         <div className="relative h-64 w-full min-w-0 md:h-auto md:flex-1">
@@ -60,7 +60,16 @@ export default function Main() {
               aria-label="Ir para seção de contato"
             >
               CONTATO
-              <svg className='h-5 w-5 text-violet-400' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M176.57-172.83q-26.79 11.4-50.44-4.34t-23.65-44.53v-162.47l346-95.83-346-95.83V-738.3q0-28.79 23.65-44.53 23.65-15.74 50.44-4.34l610.34 258.3q32.35 14.39 32.35 48.87t-32.35 48.87l-610.34 258.3Z"/></svg>
+              <svg
+                className="h-5 w-5 text-violet-400"
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="currentColor"
+              >
+                <path d="M176.57-172.83q-26.79 11.4-50.44-4.34t-23.65-44.53v-162.47l346-95.83-346-95.83V-738.3q0-28.79 23.65-44.53 23.65-15.74 50.44-4.34l610.34 258.3q32.35 14.39 32.35 48.87t-32.35 48.87l-610.34 258.3Z" />
+              </svg>
             </Link>
 
             <Link

@@ -1,12 +1,108 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import {
+  useState,
+  FormEvent,
+  InputHTMLAttributes,
+  TextareaHTMLAttributes,
+} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LoaderCircle, CheckCircle, AlertTriangle } from 'lucide-react';
+// O ícone 'Send' foi removido da importação
+import { LoaderCircle, Check, AlertTriangle } from 'lucide-react';
 
 type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
 
-// Componente auxiliar para o conteúdo dinâmico do botão com ícones filled
+// --- HOOK REUTILIZÁVEL PARA LÓGICA DE ANIMAÇÃO DO CAMPO ---
+const useFieldAnimation = (
+  value: string | number | readonly string[] | undefined,
+) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const isActive = isFocused || (value ? value.toString().length > 0 : false);
+
+  const labelVariants = {
+    inactive: {
+      y: '0%',
+      scale: 1,
+      color: 'rgb(161 161 170)', // text-zinc-400
+    },
+    active: {
+      y: '-180%',
+      scale: 0.85,
+      color: 'rgb(139 92 246)', // text-violet-500
+    },
+  };
+
+  return { isActive, labelVariants, setIsFocused };
+};
+
+// --- COMPONENTE ESPECÍFICO E SEGURO PARA INPUTS ---
+const AnimatedInput = ({
+  id,
+  label,
+  ...props
+}: { id: string; label: string } & InputHTMLAttributes<HTMLInputElement>) => {
+  const { isActive, labelVariants, setIsFocused } = useFieldAnimation(
+    props.value,
+  );
+
+  return (
+    <div className="relative mt-2">
+      <motion.label
+        htmlFor={id}
+        className="absolute left-4 top-4 origin-left cursor-text font-poppins"
+        variants={labelVariants}
+        animate={isActive ? 'active' : 'inactive'}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      >
+        {label}
+      </motion.label>
+      <input
+        id={id}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className="w-full rounded-xl bg-c0 p-4 pt-6 text-w placeholder-transparent outline-none ring-2 ring-transparent transition-shadow focus:ring-violet-500"
+        {...props}
+      />
+    </div>
+  );
+};
+
+// --- COMPONENTE ESPECÍFICO E SEGURO PARA TEXTAREA ---
+const AnimatedTextarea = ({
+  id,
+  label,
+  ...props
+}: {
+  id: string;
+  label: string;
+} & TextareaHTMLAttributes<HTMLTextAreaElement>) => {
+  const { isActive, labelVariants, setIsFocused } = useFieldAnimation(
+    props.value,
+  );
+
+  return (
+    <div className="relative mt-2">
+      <motion.label
+        htmlFor={id}
+        className="absolute left-4 top-4 origin-left cursor-text font-poppins"
+        variants={labelVariants}
+        animate={isActive ? 'active' : 'inactive'}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      >
+        {label}
+      </motion.label>
+      <textarea
+        id={id}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className="w-full resize-none rounded-xl bg-c0 p-4 pt-6 text-w placeholder-transparent outline-none ring-2 ring-transparent transition-shadow focus:ring-violet-500"
+        {...props}
+      />
+    </div>
+  );
+};
+
+// Componente para o conteúdo do botão
 const ButtonContent = ({ status }: { status: SubmissionStatus }) => {
   switch (status) {
     case 'submitting':
@@ -19,22 +115,32 @@ const ButtonContent = ({ status }: { status: SubmissionStatus }) => {
     case 'success':
       return (
         <>
-          <CheckCircle size={22} className="text-amber-400" />
+          <Check size={22} />
           <span>ENVIADA!</span>
         </>
       );
     case 'error':
       return (
         <>
-          <AlertTriangle size={20} className="text-red-500/90" />
+          <AlertTriangle size={20} />
           <span>TENTE NOVAMENTE</span>
         </>
       );
     default:
+      // ALTERAÇÃO AQUI: Substituído o ícone da biblioteca pelo seu SVG personalizado
       return (
         <>
           <span>ENVIAR MENSAGEM</span>
-          <svg className='h-5 w-5 text-violet-400' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M176.57-172.83q-26.79 11.4-50.44-4.34t-23.65-44.53v-162.47l346-95.83-346-95.83V-738.3q0-28.79 23.65-44.53 23.65-15.74 50.44-4.34l610.34 258.3q32.35 14.39 32.35 48.87t-32.35 48.87l-610.34 258.3Z"/></svg>
+          <svg
+            className="h-5 w-5 text-violet-400"
+            xmlns="http://www.w3.org/2000/svg"
+            height="24px"
+            viewBox="0 -960 960 960"
+            width="24px"
+            fill="currentColor"
+          >
+            <path d="M176.57-172.83q-26.79 11.4-50.44-4.34t-23.65-44.53v-162.47l346-95.83-346-95.83V-738.3q0-28.79 23.65-44.53 23.65-15.74 50.44-4.34l610.34 258.3q32.35 14.39 32.35 48.87t-32.35 48.87l-610.34 258.3Z" />
+          </svg>
         </>
       );
   }
@@ -50,9 +156,7 @@ export default function Contato() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmissionStatus('submitting');
-
     const formData = { name, email, message };
-
     try {
       const response = await fetch('https://formspree.io/f/mldnzygz', {
         method: 'POST',
@@ -62,36 +166,31 @@ export default function Contato() {
         },
         body: JSON.stringify(formData),
       });
-
       if (response.ok) {
         setSubmissionStatus('success');
         setName('');
         setEmail('');
         setMessage('');
-        setTimeout(() => setSubmissionStatus('idle'), 4000);
       } else {
         setSubmissionStatus('error');
-        setTimeout(() => setSubmissionStatus('idle'), 4000);
       }
     } catch (error) {
       console.error('Submit Error:', error);
       setSubmissionStatus('error');
+    } finally {
       setTimeout(() => setSubmissionStatus('idle'), 4000);
     }
   };
 
-  // Função auxiliar para definir as classes do botão com base no status
   const getButtonClassName = () => {
-    const baseClasses = `self-end rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300
-                        md:px-8 md:text-2xl font-poppins flex items-center justify-center gap-2 min-w-[300px] h-[68px] md:h-[76px]`;
-
-    let stateClasses = '';
+    const baseClasses = `self-end rounded-2xl px-6 py-3 text-lg font-semibold transition-all duration-300 cursor-pointer
+                        md:px-8 md:text-2xl font-poppins flex items-center justify-center gap-3 min-w-[300px] h-[68px] md:h-[76px]`;
+    let stateClasses = ' ';
     if (submissionStatus === 'submitting' || submissionStatus === 'success') {
-      stateClasses += ' cursor-not-allowed';
+      stateClasses += 'cursor-not-allowed';
     } else {
-      stateClasses += ' hover:-translate-y-1 active:scale-95';
+      stateClasses += 'hover:-translate-y-1 active:scale-95';
     }
-
     switch (submissionStatus) {
       case 'success':
         return `${baseClasses} ${stateClasses} bg-c1 border-2 border-amber-400 text-amber-400`;
@@ -105,7 +204,7 @@ export default function Contato() {
   return (
     <section
       id="contato"
-      className="w-full bg-b py-12 md:py-20 px-4 sm:px-6 lg:px-20"
+      className="w-full  py-12 md:py-20 px-4 sm:px-6 lg:px-20 "
     >
       <div className="container mx-auto flex w-full flex-col gap-8 sm:gap-12">
         <h2 className="font-poppins text-3xl font-semibold leading-none text-w text-right xs:text-4xl sm:text-5xl md:text-6xl lg:text-8xl">
@@ -150,59 +249,38 @@ export default function Contato() {
               </a>
             </div>
           </div>
-
           <form
             onSubmit={handleSubmit}
-            className="flex w-full max-w-xl flex-col gap-4"
+            className="flex w-full max-w-xl flex-col gap-6"
           >
-            <div>
-              <label htmlFor="name" className="sr-only">
-                Seu nome
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Seu nome"
-                className="w-full rounded-xl bg-c0 p-4 text-w placeholder-c3 outline-none transition-shadow focus:ring-2 focus:ring-purple-500"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Seu email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Seu email"
-                className="w-full rounded-xl bg-c0 p-4 text-w placeholder-c3 outline-none transition-shadow focus:ring-2 focus:ring-purple-500"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-              />
-            </div>
-            <div>
-              <label htmlFor="message" className="sr-only">
-                Sua mensagem
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                placeholder="Sua mensagem"
-                rows={5}
-                className="w-full resize-none rounded-xl bg-c0 p-4 text-w placeholder-c3 outline-none transition-shadow focus:ring-2 focus:ring-purple-500"
-                required
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              />
-            </div>
-
+            <AnimatedInput
+              id="name"
+              name="name"
+              label="Seu nome"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              autoComplete="name"
+            />
+            <AnimatedInput
+              id="email"
+              name="email"
+              label="Seu email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
+            <AnimatedTextarea
+              id="message"
+              name="message"
+              label="Sua mensagem"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+              rows={5}
+            />
             <motion.button
               type="submit"
               layout
